@@ -1,0 +1,1 @@
+![图例](img/DeferredRequestWrapper.gif)
