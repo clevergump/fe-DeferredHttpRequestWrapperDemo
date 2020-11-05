@@ -1,53 +1,62 @@
 ; (function () {
     
-    (function name(params) {
-        function req1(reqObj, successFn, failFn) {
-            printLog('=== req1: begin request...');
-            setTimeout(() => {
-                successFn({
-                    code: 0, 
-                    msg: 'req1-ok',
-                });
-            }, 2000);
-        }
-
-        function req2(reqObj, successFn, failFn) {
-            printLog('=== req2: begin request...');
-            setTimeout(() => {
-                successFn({
-                    code: 0, 
-                    msg: 'req2-ok',
-                });
-            }, 5000);
-        }
-
+    /**
+     * @param mockReq1Success 模拟请求1是否成功
+     * @param mockReq2Success 模拟请求2是否成功
+     */
+    function mockTest(mockReq1Success, mockReq2Success) {
+        console.log('---------------------------------------- 场景模拟 ----------------');
         var req1Deferred = reqDeferredObj(req1, 'req1Obj', function (respObj) {
             printLog('req1 response ok. '+respObj.code+'+++'+respObj.msg);
         }, function (respObj) {
-            printLog('req1 response fail. '+respObj.code+'+++'+respObj.msg);
+            printLog('req1 response fail. '+respObj.code+'+++'+respObj.msg, true);
         }); 
 
         var req2Deferred = reqDeferredObj(req2, 'req2Obj', function (respObj) {
             printLog('req2 response ok. '+respObj.code+'+++'+respObj.msg);
         }, function (respObj) {
-            printLog('req2 response fail. '+respObj.code+'+++'+respObj.msg);
+            printLog('req2 response fail. '+respObj.code+'+++'+respObj.msg, true);
         }); 
 
         deferReqWrapper(true, [req1Deferred, req2Deferred], function () {
-            printLog('--------------- all resp success.');
+            printLog('--------------- all response success.');
         }, function () {
-            printLog('--------------- all resp fail.');
+            printLog('--------------- all response fail.', true);
         });
 
+        function req1(reqObj, successFn, failFn) {
+            printLog('=== req1: begin request...');
+            setTimeout(() => {
+                var callbackFn = mockReq1Success ? successFn :  failFn;
+                callbackFn({
+                    code: 0, 
+                    msg: 'req1-ok',
+                });
+            }, 1000);
+        }
 
-    })();
+        function req2(reqObj, successFn, failFn) {
+            printLog('=== req2: begin request...');
+            setTimeout(() => {
+                var callbackFn = mockReq2Success ? successFn :  failFn;
+                callbackFn({
+                    code: 0, 
+                    msg: 'req2-ok',
+                });
+            }, 3000);
+        }
+    }
     
     function getCurrentDateTime() {
         return new Date().toTimeString();
     }
 
-    function printLog(appendixLog) {
-        console.log(getCurrentDateTime()+"   " + appendixLog);
+    function printLog(appendixLog, isErrorLog) {
+        if (isErrorLog) {
+            console.error(getCurrentDateTime()+"   " + appendixLog);
+        } else {
+            console.log(getCurrentDateTime()+"   " + appendixLog);
+        }
     }
     
     /**
@@ -99,20 +108,28 @@
             throw new Error('onSuccessFn must be typeof function');
         }
         var $deferred = $.Deferred();
-        var onSuccessWrapperFn = deferResolveCurriedFn($deferred, onSuccessFn);
-        var onFailWrapperFn = deferResolveCurriedFn($deferred, onFailFn);
+        var onSuccessWrapperFn = deferResolveCurriedFn($deferred, true, onSuccessFn);
+        var onFailWrapperFn = deferResolveCurriedFn($deferred, false, onFailFn);
         reqFn(reqObj, onSuccessWrapperFn, onFailWrapperFn);
         return $deferred.promise();
 
-        function deferResolveCurriedFn(deferred, callbackFn) {
+        function deferResolveCurriedFn(deferred, isSuccess, callbackFn) {
             if (!_.isFunction(callbackFn)) {
                 throw new Error('callbackFn must be typeof function');
             }
             return function (respObj) {
                 callbackFn(respObj);
-                deferred.resolve();
+                if (isSuccess) {
+                    deferred.resolve();
+                } else {
+                    deferred.reject();
+                }
             }
         }
     }
+
+    window.DeferredHttpRequestWrapper = {
+        mockTest: mockTest,
+    };
 
 })();

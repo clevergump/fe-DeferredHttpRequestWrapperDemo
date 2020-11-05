@@ -4,9 +4,29 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Deferred Request Wrapper Demo</title>
+    <style>
+        .fontRed {
+            font-weight: bold;
+            color: red;
+        }
+        .fontGreen {
+            font-weight: bold;
+            color: green;
+        }
+    </style>
 </head>
-<body>
-    <h1>Deferred Request Wrapper Demo</h1>
+<body>    
+    <section>
+        <p><b>模拟的场景描述: </b><br>同时发送请求1和2, 请求1执行耗时1秒, 请求2执行耗时3秒, 需要在两个请求都完成以后再执行某些后续行为.</span>
+        
+        <ol>
+            <li>模拟请求1 <span class="fontGreen">成功</span>, 请求2 <span class="fontGreen">成功</span> 的场景   <button onclick="DeferredHttpRequestWrapper.mockTest(true, true)">执行</button></li>
+            <li>模拟请求1 <span class="fontGreen">成功</span>, 请求2 <span class="fontRed">失败</span> 的场景 <button onclick="DeferredHttpRequestWrapper.mockTest(true, false)">执行</button></li>
+            <li>模拟请求1 <span class="fontRed">失败</span>, 请求2 <span class="fontGreen">成功</span> 的场景 <button onclick="DeferredHttpRequestWrapper.mockTest(false, true)">执行</button></li>
+            <li>模拟请求1 <span class="fontRed">失败</span>, 请求2 <span class="fontRed">失败</span> 的场景   <button onclick="DeferredHttpRequestWrapper.mockTest(false, false)">执行</button></li>
+        </ol>
+        
+    </section>
     <script src="js/lodash-4.17.11.js"></script>
     <script src="js/jquery.js"></script>
     <script src="js/demo.js"></script>
