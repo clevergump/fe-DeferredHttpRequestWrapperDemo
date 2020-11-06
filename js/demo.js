@@ -28,14 +28,14 @@
             }
             var promise = $.when.apply(null, reqDeferredArray);
             promise.then(
-                hideLoadingBarCurriedFn(allDeferredReqSuccessFn, true)
-                , hideLoadingBarCurriedFn(allDeferredReqFailFn, true)
+                hideLoadingBarCurriedFn(allDeferredReqSuccessFn)
+                , hideLoadingBarCurriedFn(allDeferredReqFailFn)
             );
             
-            function hideLoadingBarCurriedFn(callbackFn, currentDismissLoadingBar) {
+            function hideLoadingBarCurriedFn(callbackFn) {
                 return function () {
                     _.isFunction(callbackFn) && callbackFn();
-                    if (shouldShowLoadingBar && currentDismissLoadingBar) {
+                    if (shouldShowLoadingBar) {
                         dismissLoadingBar();
                     }
                 }
